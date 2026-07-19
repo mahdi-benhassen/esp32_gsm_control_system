@@ -1,0 +1,27 @@
+# Target chip (allows `idf.py build` without `idf.py set-target` first — used by CI)
+CONFIG_IDF_TARGET="esp32"
+
+# Flash: KC868-A2 ships with 4MB
+CONFIG_ESPTOOLPY_FLASHSIZE_4MB=y
+CONFIG_ESPTOOLPY_FLASHSIZE="4MB"
+
+# Partition table: custom single factory app
+CONFIG_PARTITION_TABLE_CUSTOM=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions.csv"
+CONFIG_PARTITION_TABLE_FILENAME="partitions.csv"
+
+# Serial flasher / monitor
+CONFIG_ESPTOOLPY_FLASHMODE_QIO=y
+CONFIG_ESPTOOLPY_FLASHFREQ_40M=y
+CONFIG_ESPTOOLPY_BAUD_460800=y
+CONFIG_MONITOR_BAUD_115200=y
+
+# FreeRTOS tick for decent timing resolution
+CONFIG_FREERTOS_HZ_1000=y
+CONFIG_FREERTOS_HZ=1000
+
+# Compiler: useful warnings
+CONFIG_COMPILER_WARN_WRITE_STRINGS=y
+
+# Keep log level Info on UART0 console
+CONFIG_LOG_DEFAULT_LEVEL_INFO=y

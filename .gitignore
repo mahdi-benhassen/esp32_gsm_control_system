@@ -1,0 +1,15 @@
+# ESP-IDF build output
+build/
+sdkconfig
+sdkconfig.old
+managed_components/
+dependencies.lock
+
+# Editor / OS noise
+.vscode/
+.idea/
+*.swp
+*.bak
+Thumbs.db
+.DS_Store
+__pycache__/

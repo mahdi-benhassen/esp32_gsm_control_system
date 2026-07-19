@@ -1,0 +1,47 @@
+menu "Agriculture Controller Configuration"
+
+    config AGRI_MASTER_PIN
+        string "PIN for MASTER registration SMS command"
+        default "1234"
+        help
+            Any phone can claim the master (authorized) number by sending
+            "MASTER <pin>". Change this before deploying.
+
+    config AGRI_DEFAULT_MOISTURE_THRESHOLD
+        int "Default soil moisture threshold (percent)"
+        range 5 95
+        default 30
+        help
+            In AUTO mode the pump starts below this moisture level and stops
+            at threshold + hysteresis. Can be changed later by SMS (THRESH n)
+            and is persisted in NVS.
+
+    config AGRI_MOISTURE_HYSTERESIS
+        int "Moisture hysteresis (percent)"
+        range 1 30
+        default 5
+
+    config AGRI_PUMP_MAX_RUNTIME_S
+        int "Pump safety max runtime (seconds)"
+        range 10 7200
+        default 300
+        help
+            Hard safety limit: the pump is switched OFF after this time no
+            matter what, to prevent flooding / dry-run damage.
+
+    config AGRI_PUMP_MIN_CYCLE_S
+        int "Minimum time between two pump starts (seconds)"
+        range 0 86400
+        default 600
+
+    config AGRI_SMS_POLL_INTERVAL_S
+        int "SMS inbox poll interval (seconds)"
+        range 5 300
+        default 15
+
+    config AGRI_SENSOR_PERIOD_S
+        int "Sensor sampling period (seconds)"
+        range 2 600
+        default 10
+
+endmenu

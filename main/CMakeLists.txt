@@ -1,0 +1,17 @@
+idf_component_register(
+    SRCS
+        "app_main.c"
+        "gsm_modem.c"
+        "sensors.c"
+        "control.c"
+        "config_store.c"
+    INCLUDE_DIRS
+        "."
+    REQUIRES
+        driver
+        nvs_flash
+        esp_adc
+        esp_timer
+        esp_app_format
+        esp_rom
+)

@@ -1,0 +1,83 @@
+name: ESP-IDF Build
+
+on:
+  push:
+    branches: [main, master]
+    tags: ["v*"]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: esp-idf-build-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build firmware (ESP-IDF v5.3)
+    runs-on: ubuntu-latest
+    container:
+      image: espressif/idf:v5.3.1
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Build with idf.py
+        shell: bash
+        run: |
+          . $IDF_PATH/export.sh
+          idf.py build
+
+      - name: Merge flash image
+        shell: bash
+        run: |
+          . $IDF_PATH/export.sh
+          idf.py merge-bin -o build/firmware_merged.bin || \
+            (cd build && esptool.py --chip esp32 merge_bin -o firmware_merged.bin @flash_args)
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ github.sha }}
+          path: |
+            build/firmware_merged.bin
+            build/*.bin
+            build/*.elf
+            build/*.map
+            build/flasher_args.json
+            build/flash_args
+            build/bootloader/bootloader.bin
+            build/partition_table/partition-table.bin
+            build/config/sdkconfig.h
+          if-no-files-found: warn
+          retention-days: 30
+
+  release:
+    name: Publish release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download firmware artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: firmware-${{ github.sha }}
+          path: firmware
+
+      - name: Package firmware
+        run: |
+          cd firmware
+          zip ../esp32-gsm-agriculture-firmware.zip \
+            firmware_merged.bin *.bin *.elf flasher_args.json flash_args 2>/dev/null || true
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            esp32-gsm-agriculture-firmware.zip
+            firmware/firmware_merged.bin
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
